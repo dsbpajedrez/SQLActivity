@@ -48,7 +48,8 @@ WHERE EstadoPedido = 'Cancelado'
 -- Utilizando como base la consulta anterior, 
 -- y utilizándola como una subconsulta, obtener el denominación social y teléfono de esos clientes. 
 
-SELECT DenominacionSocial, Telefono
+--SELECT DenominacionSocial, Telefono
+SELECT *
 FROM EC_Clientes_EM AS CL_EM
 INNER JOIN (SELECT IDFactura, IDCliente, FechaPedido, Total_con_Impuestos
 FROM EC_Facturas
@@ -59,7 +60,7 @@ WHERE EstadoPedido = 'Cancelado'
 -- Obtener un listado compuesto por factura, nombre de producto, color, precio unitario, 
 -- cantidad y el % de descuento de las transacciones realizadas entre el abril y septiembre de 2019.
 
---Dudas: La fecha de la transacción es la fecha de envio?
+-------------------------Dudas: La fecha de la transacción es la fecha de envio?-------------------------------------------
 
 SELECT FACT.IDFactura, PROD.Nombre, PROD.Color, PROD.Precio, TRANS.Cantidad, TRANS.Descuento
 FROM EC_Productos AS PROD
@@ -112,4 +113,19 @@ ON FACT.IDCliente = CLI.IDCliente
 GROUP BY CLI_IN.Nombre, CLI.NumeroCuenta
 HAVING SUM(FACT.Total) > 1500
 ORDER BY MontanteTotal DESC
+--------------------------- ensayo con left-------------------------------
+SELECT CL_IN.Nombre, 
+		CL.NumeroCuenta, 
+		COUNT(FACT.IDFactura) AS NUMERO_COMPRAS,
+		SUM(FACT.Total) AS MONTANTE_TOTAL
+FROM EC_Facturas AS FACT
+INNER JOIN EC_Clientes AS CL
+ON FACT.IDCliente = CL.IDCliente
+LEFT JOIN EC_Clientes_IN AS CL_IN
+ON FACT.IDCliente = CL_IN.IDCliente
+GROUP BY CL_IN.Nombre, CL.NumeroCuenta, CL.IDCliente
+HAVING SUM(FACT.Total) > 1500
+ORDER BY MONTANTE_TOTAL DESC
 
+SELECT * FROM EC_Clientes
+SELECT * FROM EC_Clientes_IN
