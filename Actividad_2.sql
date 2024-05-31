@@ -18,6 +18,7 @@ FROM EC_Productos
 WHERE Precio > 20
 	AND Talla_disponibles = 'XS-XL'
 
+
 -- Proporcionar un listado de clientes individuos compuesto por IDCliente, nombre, apellidos 
 -- y género que hayan nacido entre 1970 y 1980, cuya ocupación no sea investigador, 
 -- ordenados por fecha de primera compra de forma descendente.
@@ -84,6 +85,8 @@ ON PROD.GrupoProductoID = CAT_PROD.GrupoProductoID
 GROUP BY PROD.GrupoProductoID
 ORDER BY Cantidad_de_productos DESC
 
+
+
 -- Obtener las ventas totales con impuestos por país y región. 
 -- Excluyendo los pedidos cancelados. Ordenados de menor a mayor por el total de las ventas. 
 
@@ -119,7 +122,7 @@ SELECT CL_IN.Nombre,
 		COUNT(FACT.IDFactura) AS NUMERO_COMPRAS,
 		SUM(FACT.Total) AS MONTANTE_TOTAL
 FROM EC_Facturas AS FACT
-INNER JOIN EC_Clientes AS CL
+LEFT JOIN EC_Clientes AS CL
 ON FACT.IDCliente = CL.IDCliente
 LEFT JOIN EC_Clientes_IN AS CL_IN
 ON FACT.IDCliente = CL_IN.IDCliente
@@ -127,5 +130,22 @@ GROUP BY CL_IN.Nombre, CL.NumeroCuenta, CL.IDCliente
 HAVING SUM(FACT.Total) > 1500
 ORDER BY MONTANTE_TOTAL DESC
 
-SELECT * FROM EC_Clientes
-SELECT * FROM EC_Clientes_IN
+-------------------------otra forma (o la correcta)
+-- Se desea saber el número de pedidos, el montante total sin impuestos para clientes individuos, así como el nombre 
+-- y el número de cuenta de los mismos.  Solo queremos aquellos cuyo montante total supera los 1500 euros. 
+-- Ordenar el resultado de mayor a menor en función del montante total calculado.
+
+SELECT C_IN.Nombre,
+		C.NumeroCuenta,
+		SUM(F.Total) AS MonteTotal,
+		COUNT(F.IDFactura) AS NUMERO_PEDIDOS
+FROM EC_Clientes_IN AS C_IN
+LEFT JOIN EC_Clientes AS C
+ON C_IN.IDCliente = C.IDCliente
+LEFT JOIN EC_Facturas AS F
+ON C_IN.IDCliente = F.IDCliente
+WHERE F.EstadoPedido = 'Enviado'
+GROUP BY C_IN.Nombre, C.NumeroCuenta
+HAVING SUM(F.Total) > 1500
+ORDER BY MonteTotal DESC
+
