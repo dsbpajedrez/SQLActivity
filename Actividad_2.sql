@@ -104,37 +104,6 @@ ORDER BY Venta_Total
 -- y el número de cuenta de los mismos.  Solo queremos aquellos cuyo montante total supera los 1500 euros. 
 -- Ordenar el resultado de mayor a menor en función del montante total calculado.
 
-SELECT COUNT(FACT.IDFactura) AS NumeroPedidos , 
-	SUM(FACT.Total) AS MontanteTotal,
-	CLI_IN.Nombre,
-	CLI.NumeroCuenta
-FROM EC_Facturas AS FACT
-INNER JOIN EC_Clientes_IN AS CLI_IN
-ON FACT.IDCliente = CLI_IN.IDCliente
-INNER JOIN EC_Clientes AS CLI
-ON FACT.IDCliente = CLI.IDCliente
-GROUP BY CLI_IN.Nombre, CLI.NumeroCuenta
-HAVING SUM(FACT.Total) > 1500
-ORDER BY MontanteTotal DESC
---------------------------- ensayo con left-------------------------------
-SELECT CL_IN.Nombre, 
-		CL.NumeroCuenta, 
-		COUNT(FACT.IDFactura) AS NUMERO_COMPRAS,
-		SUM(FACT.Total) AS MONTANTE_TOTAL
-FROM EC_Facturas AS FACT
-LEFT JOIN EC_Clientes AS CL
-ON FACT.IDCliente = CL.IDCliente
-LEFT JOIN EC_Clientes_IN AS CL_IN
-ON FACT.IDCliente = CL_IN.IDCliente
-GROUP BY CL_IN.Nombre, CL.NumeroCuenta, CL.IDCliente
-HAVING SUM(FACT.Total) > 1500
-ORDER BY MONTANTE_TOTAL DESC
-
--------------------------otra forma (o la correcta)
--- Se desea saber el número de pedidos, el montante total sin impuestos para clientes individuos, así como el nombre 
--- y el número de cuenta de los mismos.  Solo queremos aquellos cuyo montante total supera los 1500 euros. 
--- Ordenar el resultado de mayor a menor en función del montante total calculado.
-
 SELECT C_IN.Nombre,
 		C.NumeroCuenta,
 		SUM(F.Total) AS MonteTotal,
